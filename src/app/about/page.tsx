@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function AboutPage() {
@@ -26,135 +25,150 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <>
+    <main className="pt-[160px] min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 bg-light">
-        <div className="container-custom">
-          <div className="max-w-4xl mx-auto text-center">
-            <span className="text-xs tracking-[0.3em] text-muted uppercase animate-fade-in">
-              L&apos;artiste
-            </span>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold mt-4 mb-6 animate-slide-up">
-              Qui est Zellem ?
-            </h1>
-            <p className="text-lg text-secondary max-w-2xl mx-auto animate-slide-up stagger-1">
-              Art . Love . Life — Une philosophie de vie qui guide chaque création
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content */}
-      <section className="py-24 bg-white">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-            {/* Artist Photo */}
+      <section className="px-[3vw] pb-16">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            {/* Image */}
             <div className="reveal-on-scroll opacity-0">
-              <div className="sticky top-32">
-                <div className="aspect-[3/4] relative bg-gradient-to-br from-gray-200 to-gray-300 mb-6">
-                  {/* Placeholder for artist photo */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-gray-400">Portrait de Zellem</span>
-                  </div>
+              <div className="sticky top-[200px]">
+                <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
+                  <img
+                    src="/images/zellem-portrait.jpg"
+                    alt="Zellem - Dualité"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
                 </div>
-                {/* Social Links */}
-                <div className="flex items-center gap-4">
-                  <a
-                    href="https://www.instagram.com/_zellem_/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-muted hover:text-accent transition-colors duration-300"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-sm">@_zellem_</span>
-                  </a>
-                </div>
+                <p className="text-center text-sm text-gray-400 mt-4 italic">Dualité</p>
               </div>
             </div>
 
-            {/* Biography Content */}
-            <div className="reveal-on-scroll opacity-0 stagger-2">
-              <div className="prose prose-lg max-w-none">
-                <h2 className="font-display text-2xl font-semibold mb-6">
-                  Une passion née de l&apos;émotion
+            {/* Content */}
+            <div className="reveal-on-scroll opacity-0">
+              {/* Main Title */}
+              <div className="mb-12">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-[0.05em] leading-tight">
+                  ZELLEM,
+                </h1>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-light tracking-[0.05em] text-gray-600">
+                  L&apos;ART DE L&apos;INVISIBLE
                 </h2>
-                <p className="text-secondary leading-relaxed mb-6">
-                  L&apos;art a toujours été mon refuge, mon langage silencieux.
-                  Depuis mon plus jeune âge, je trouve dans la peinture un moyen
-                  d&apos;exprimer ce que les mots ne peuvent capturer — les nuances
-                  de l&apos;âme, les vibrations de l&apos;instant.
+                <p className="mt-4 text-sm tracking-[0.15em] text-gray-500 uppercase">
+                  Expression artistique de l&apos;être
                 </p>
+              </div>
 
-                <h2 className="font-display text-2xl font-semibold mb-6 mt-12">
-                  Mon approche artistique
-                </h2>
-                <p className="text-secondary leading-relaxed mb-6">
-                  Chaque toile est une conversation intime entre la matière et
-                  l&apos;émotion. Je travaille principalement les portraits et les
-                  compositions abstraites, explorant les frontières entre le
-                  visible et l&apos;invisible.
+              {/* Introduction */}
+              <div className="mb-12">
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  Je peins ce que les mots taisent. Ce que l&apos;on ressent sans toujours savoir dire.
                 </p>
-                <p className="text-secondary leading-relaxed mb-6">
-                  Les couleurs sont mes mots, les textures mes phrases. Je laisse
-                  souvent l&apos;œuvre me guider, acceptant que le résultat final
-                  soit une surprise autant pour moi que pour le spectateur.
+                <p className="text-gray-600 leading-relaxed mt-4">
+                  À travers la peinture, j&apos;explore ce lien invisible qui unit les êtres, ce qui vibre entre les mondes, ce qui relie l&apos;humanité à l&apos;univers. Entre corps et esprit, matière et énergie, visible et invisible.
                 </p>
+              </div>
 
-                <h2 className="font-display text-2xl font-semibold mb-6 mt-12">
-                  Techniques et inspirations
-                </h2>
-                <p className="text-secondary leading-relaxed mb-6">
-                  Je travaille essentiellement à l&apos;acrylique et à l&apos;huile,
-                  parfois en technique mixte pour créer des effets de profondeur
-                  uniques. Mes inspirations puisent dans la nature humaine, les
-                  émotions brutes et la beauté de l&apos;imperfection.
+              {/* Qui suis-je */}
+              <div className="mb-12 py-8 border-t border-gray-200">
+                <h3 className="text-xl font-light tracking-[0.1em] mb-6">Qui suis-je ?</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Depuis mon enfance, j&apos;ai toujours ressenti un besoin profond de créer. Le dessin, la peinture, la danse et la poésie ont été mes premiers langages.
                 </p>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Pendant mes études – de la gestion au marketing, en passant par la communication et le web design – je me suis toujours sentie en décalage. Quelque chose de plus profond bouillonnait en moi, sans pouvoir encore prendre pleinement sa place.
+                </p>
+                <p className="text-gray-600 leading-relaxed">
+                  Ce quelque chose, c&apos;était l&apos;art : un besoin vital de dire, de provoquer, de susciter, d&apos;éveiller, de faire bouger le monde… le mien, pour commencer.
+                </p>
+              </div>
 
-                <blockquote className="border-l-4 border-accent pl-6 my-12 italic text-secondary">
-                  &ldquo;Chaque œuvre porte en elle une part de mon âme. Quand
-                  quelqu&apos;un acquiert une de mes créations, c&apos;est un peu de
-                  moi qui continue à vivre ailleurs.&rdquo;
-                </blockquote>
+              {/* Mes débuts */}
+              <div className="mb-12 py-8 border-t border-gray-200">
+                <h3 className="text-xl font-light tracking-[0.1em] mb-6">Mes débuts</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  C&apos;est en 2016, à l&apos;âge de 27 ans, après avoir été percutée de plein fouet par le rejet et le mépris, que je réalise ma première toile. Elle marque un tournant. La peinture devient alors mon refuge, mon exutoire.
+                </p>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  À travers elle, je comprends que si le monde me rejette, l&apos;art, lui, me renverra cet amour que je lui porte et ne m&apos;abandonnera jamais.
+                </p>
+                <p className="text-gray-600 leading-relaxed">
+                  Si un jour les mots manquent, peu importe ce qui sera enfoui et bloqué en moi — laideur ou beauté — la peinture restera toujours un moyen de libération puissant.
+                </p>
+              </div>
 
-                <h2 className="font-display text-2xl font-semibold mb-6 mt-12">
-                  Art . Love . Life
-                </h2>
-                <p className="text-secondary leading-relaxed mb-6">
-                  Cette devise résume ma philosophie : l&apos;art comme expression de
-                  l&apos;amour pour la vie. Chaque création est un acte d&apos;amour,
-                  une célébration de l&apos;existence dans toute sa complexité.
+              {/* Une renaissance */}
+              <div className="mb-12 py-8 border-t border-gray-200">
+                <h3 className="text-xl font-light tracking-[0.1em] mb-6">Une renaissance</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  La vie active m&apos;emporte loin de mes rêves et m&apos;éloigne de moi-même… jusqu&apos;à ce qu&apos;au bord du précipice, la peinture me rattrape. Plus je me perds, plus elle m&apos;appelle. Chaque toile devient une exploration intérieure, un pas vers une version plus consciente de moi-même.
+                </p>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  En 2019, en parallèle d&apos;un travail thérapeutique, je peins <em>Moi</em>. Une œuvre-passerelle entre passé, présent et futur. Elle révèle une vérité essentielle : je suis toutes ces temporalités à la fois.
+                </p>
+                <p className="text-gray-600 leading-relaxed">
+                  Cette prise de conscience m&apos;a ancrée, recentrée et a réveillé en moi un élan vital : le désir sincère de créer pour contribuer à un monde meilleur, plus équilibré, plus beau, plus conscient.
+                </p>
+              </div>
+
+              {/* Et aujourd'hui */}
+              <div className="mb-12 py-8 border-t border-gray-200">
+                <h3 className="text-xl font-light tracking-[0.1em] mb-6">Et aujourd&apos;hui ?</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Mon travail est en constante évolution. Il s&apos;enracine dans des thématiques profondes : la santé mentale, la spiritualité, la physique quantique, l&apos;astronomie… Autant de dimensions qui nourrissent ma quête de sens et s&apos;expriment au fil de mes toiles.
+                </p>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Il n&apos;en reste pas moins, au cœur de mon art : la femme, l&apos;essence de mon être. Je la représente dans toute sa puissance et sa beauté.
+                </p>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Le corps devient un langage universel — un langage en mouvement, en lien avec l&apos;espace qui l&apos;entoure. En jouant avec la symétrie, je fusionne les corps pour exprimer la connexion profonde qui nous relie les uns aux autres, dans l&apos;unité de l&apos;humanité.
+                </p>
+                <p className="text-gray-600 leading-relaxed">
+                  Je privilégie la forme générale, je gomme les visages, j&apos;efface les détails de la peau… pour mieux faire émerger l&apos;essentiel : ce lien invisible, profond, universel. Au-delà des apparences, c&apos;est cette présence commune, cette énergie invisible, que je cherche à révéler. Un langage sans mots, qui parle à chacun selon sa propre histoire. Une invitation à ressentir la puissance de notre humanité partagée à travers le prisme de la femme.
+                </p>
+              </div>
+
+              {/* Une invitation */}
+              <div className="mb-12 py-8 border-t border-gray-200">
+                <h3 className="text-xl font-light tracking-[0.1em] mb-6">Une invitation à la réflexion</h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Depuis la nuit des temps, l&apos;humanité cherche à comprendre ce qui la dépasse, à repousser les limites de son propre horizon. Par le biais de la peinture, je m&apos;interroge sur les grandes questions de l&apos;existence.
+                </p>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  L&apos;art, pour moi, est un moyen d&apos;explorer ces mystères et de tisser des ponts :
+                </p>
+                <ul className="text-gray-600 leading-relaxed mb-4 space-y-1 pl-4">
+                  <li>entre le visible et l&apos;invisible,</li>
+                  <li>entre les sciences et la spiritualité,</li>
+                  <li>entre le soi profond et l&apos;univers infini.</li>
+                </ul>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Il ne s&apos;agit pas simplement de représenter, mais de révéler. Révéler ce qui relie, ce qui transcende, ce qui élève l&apos;humanité.
+                </p>
+              </div>
+
+              {/* Signature */}
+              <div className="py-12 border-t border-gray-200 text-center">
+                <p className="text-lg tracking-[0.2em] font-light mb-6">
+                  ART . LOVE . LIFE
+                </p>
+                <p className="text-2xl font-light tracking-[0.1em] italic">
+                  Zellem
                 </p>
               </div>
 
               {/* CTA */}
-              <div className="mt-12 pt-12 border-t border-gray-200">
-                <h3 className="font-display text-xl font-semibold mb-4">
-                  Envie d&apos;acquérir une œuvre ?
-                </h3>
-                <p className="text-secondary mb-6">
-                  Découvrez ma collection dans la boutique ou contactez-moi pour
-                  une commande personnalisée.
-                </p>
-                <div className="flex flex-wrap gap-4">
+              <div className="pt-8 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/boutique"
-                    className="px-6 py-3 bg-primary text-white font-medium tracking-wide hover:bg-secondary transition-colors duration-300"
+                    className="flex-1 px-8 py-4 bg-black text-white text-sm tracking-[0.1em] text-center hover:bg-gray-800 transition-colors duration-300"
                   >
-                    Voir la boutique
+                    Découvrir mes œuvres
                   </Link>
                   <Link
                     href="/contact"
-                    className="px-6 py-3 border border-primary text-primary font-medium tracking-wide hover:bg-primary hover:text-white transition-colors duration-300"
+                    className="flex-1 px-8 py-4 border border-black text-sm tracking-[0.1em] text-center hover:bg-black hover:text-white transition-all duration-300"
                   >
                     Me contacter
                   </Link>
@@ -164,70 +178,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* Timeline / Milestones */}
-      <section className="py-24 bg-light">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="font-display text-3xl font-semibold text-center mb-16 reveal-on-scroll opacity-0">
-              Parcours artistique
-            </h2>
-
-            <div className="space-y-12">
-              {[
-                {
-                  year: "2020",
-                  title: "Premiers pas",
-                  description:
-                    "Début de mon aventure artistique, exploration des techniques de base.",
-                },
-                {
-                  year: "2021",
-                  title: "Développement du style",
-                  description:
-                    "Affirmation de mon identité artistique, premiers portraits.",
-                },
-                {
-                  year: "2022",
-                  title: "Premières ventes",
-                  description:
-                    "Mes œuvres trouvent leurs premiers admirateurs.",
-                },
-                {
-                  year: "2023",
-                  title: "Expansion",
-                  description:
-                    "Lancement de la galerie en ligne, diversification des techniques.",
-                },
-                {
-                  year: "2024",
-                  title: "Aujourd'hui",
-                  description:
-                    "Continue de créer, d'explorer et de partager ma passion.",
-                },
-              ].map((milestone, index) => (
-                <div
-                  key={milestone.year}
-                  className={`flex gap-8 reveal-on-scroll opacity-0 stagger-${index + 1}`}
-                >
-                  <div className="flex-shrink-0 w-20">
-                    <span className="font-display text-2xl font-semibold text-accent">
-                      {milestone.year}
-                    </span>
-                  </div>
-                  <div className="flex-1 pb-12 border-l border-gray-300 pl-8 relative">
-                    <div className="absolute left-0 top-2 w-3 h-3 bg-accent rounded-full -translate-x-1/2" />
-                    <h3 className="font-display text-xl font-semibold mb-2">
-                      {milestone.title}
-                    </h3>
-                    <p className="text-secondary">{milestone.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+    </main>
   );
 }
