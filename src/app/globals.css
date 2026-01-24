@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #1a1a1a;
+  --foreground: #000000;
   --background: #ffffff;
-  --muted: #82868b;
-  --accent: #9b51e0;
+  --muted: #666666;
+  --border: #e5e5e5;
 }
 
 * {
@@ -24,9 +24,12 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
 /* Smooth scrolling */
@@ -34,28 +37,16 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Hide scrollbar but keep functionality */
 ::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  width: 0px;
+  background: transparent;
 }
 
 /* Selection */
 ::selection {
-  background: var(--accent);
-  color: white;
+  background: #000;
+  color: #fff;
 }
 
 /* Links */
@@ -70,14 +61,22 @@ img {
   height: auto;
 }
 
-/* Utility classes */
+/* Container with Novo-style padding (3vw) */
+.container-novo {
+  padding-left: 3vw;
+  padding-right: 3vw;
+}
+
+/* Legacy container */
 .container-custom {
-  @apply max-w-7xl mx-auto px-6 lg:px-8;
+  @apply max-w-7xl mx-auto;
+  padding-left: 3vw;
+  padding-right: 3vw;
 }
 
 /* Transitions */
 .transition-default {
-  @apply transition-all duration-300 ease-in-out;
+  @apply transition-all duration-300 ease-out;
 }
 
 /* Hover effects for images */
@@ -86,11 +85,17 @@ img {
 }
 
 .image-hover img {
-  @apply transition-transform duration-500 ease-out;
+  @apply transition-transform duration-700 ease-out;
 }
 
 .image-hover:hover img {
   @apply scale-105;
+}
+
+/* Typography - Novo Style */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 300;
+  letter-spacing: 0.05em;
 }
 
 /* Text animations */
@@ -113,14 +118,21 @@ img {
 .stagger-4 { animation-delay: 0.4s; }
 .stagger-5 { animation-delay: 0.5s; }
 
-/* Gallery grid styles */
-.gallery-grid {
-  @apply grid gap-4;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+/* Gallery grid styles - Novo */
+.gallery-grid-novo {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0;
 }
 
 @media (min-width: 768px) {
-  .gallery-grid {
+  .gallery-grid-novo {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .gallery-grid-novo {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -128,7 +140,7 @@ img {
 /* Masonry-like layout */
 .masonry-grid {
   column-count: 1;
-  column-gap: 1rem;
+  column-gap: 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -145,7 +157,52 @@ img {
 
 .masonry-item {
   break-inside: avoid;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Button styles - Novo */
+.btn-novo {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  transition: all 0.3s ease;
+}
+
+.btn-novo:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.btn-novo-filled {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  transition: all 0.3s ease;
+}
+
+.btn-novo-filled:hover {
+  background: transparent;
+  color: #000;
+}
+
+/* Form inputs - Novo style */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #000;
 }
 
 /* Page transitions */
@@ -157,7 +214,7 @@ img {
 .page-transition-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
 }
 
 .page-transition-exit {
@@ -166,5 +223,57 @@ img {
 
 .page-transition-exit-active {
   opacity: 0;
-  transition: opacity 300ms;
+  transition: opacity 300ms ease-out;
+}
+
+/* Social icon button style */
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  border-color: #000;
+  color: #000;
+}
+
+/* Project card hover effect */
+.project-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.5s ease;
+}
+
+.project-card:hover::after {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.project-card .project-title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.5s ease;
+  z-index: 1;
+}
+
+.project-card:hover .project-title {
+  opacity: 1;
+  transform: translateY(0);
 }
