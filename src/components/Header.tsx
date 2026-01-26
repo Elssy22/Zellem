@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { href: "/", label: "Mon travail" },
@@ -15,6 +16,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const { totalItems, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,8 +73,23 @@ export default function Header() {
             </ul>
           </nav>
 
-          {/* Social Icons */}
+          {/* Cart & Social Icons */}
           <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+            {/* Cart */}
+            <button
+              onClick={openCart}
+              className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:text-black hover:border-black transition-all duration-300 relative"
+              aria-label="Panier"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
             {/* Instagram */}
             <a
               href="https://www.instagram.com/_zellem_/"
@@ -112,12 +129,30 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMenu}
-          className="md:hidden relative z-50 p-2 -mr-2"
-          aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-        >
+        {/* Mobile: Cart + Menu Button */}
+        <div className="flex items-center gap-2 md:hidden">
+          {/* Cart Mobile */}
+          <button
+            onClick={openCart}
+            className="relative z-50 p-2"
+            aria-label="Panier"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            {totalItems > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-black text-white text-[10px] rounded-full flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
+
+          {/* Menu Button */}
+          <button
+            onClick={toggleMenu}
+            className="relative z-50 p-2 -mr-2"
+            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          >
           <div className="w-6 h-5 flex flex-col justify-between">
             <span
               className={`block h-0.5 bg-black transform transition-all duration-300 origin-center ${
@@ -135,7 +170,8 @@ export default function Header() {
               }`}
             />
           </div>
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}

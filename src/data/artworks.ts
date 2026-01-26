@@ -22,6 +22,7 @@ export const artworks: Artwork[] = [
     technique: "Acrylique sur toile",
     dimensions: "100 x 125 cm",
     year: 2024,
+    price: 1500,
     available: true,
   },
   {
@@ -33,6 +34,7 @@ export const artworks: Artwork[] = [
     technique: "Acrylique sur toile",
     dimensions: "100 x 125 cm",
     year: 2024,
+    price: 1500,
     available: true,
   },
   {
@@ -44,6 +46,7 @@ export const artworks: Artwork[] = [
     technique: "Acrylique sur toile",
     dimensions: "100 x 125 cm",
     year: 2024,
+    price: 1500,
     available: true,
   },
   {
@@ -55,6 +58,7 @@ export const artworks: Artwork[] = [
     technique: "Acrylique sur toile",
     dimensions: "100 x 125 cm",
     year: 2024,
+    price: 1500,
     available: true,
   },
   {
@@ -66,6 +70,7 @@ export const artworks: Artwork[] = [
     technique: "Acrylique sur toile",
     dimensions: "100 x 125 cm",
     year: 2024,
+    price: 1500,
     available: true,
   },
   {
@@ -77,6 +82,7 @@ export const artworks: Artwork[] = [
     technique: "Acrylique sur toile",
     dimensions: "100 x 125 cm",
     year: 2024,
+    price: 1500,
     available: true,
   },
 ];

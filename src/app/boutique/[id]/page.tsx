@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { artworks, getArtworkById, Artwork } from "@/data/artworks";
+import { useCart } from "@/context/CartContext";
 
 export default function ArtworkDetailPage() {
   const params = useParams();
   const [artwork, setArtwork] = useState<Artwork | null>(null);
-  const [showContactForm, setShowContactForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { addToCart, items } = useCart();
 
   useEffect(() => {
     const found = getArtworkById(params.id as string);
@@ -92,24 +93,24 @@ export default function ArtworkDetailPage() {
           {/* Info */}
           <div className="lg:sticky lg:top-[200px] lg:self-start">
             {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-light tracking-[0.05em] mb-4">
+            <h1 className="text-3xl md:text-4xl font-light tracking-[0.05em] mb-8">
               {artwork.title}
             </h1>
 
-            {/* Price */}
-            {artwork.price && (
-              <div className="mb-8">
-                <span className="text-2xl font-light">
-                  {artwork.price.toLocaleString("fr-FR")} €
-                </span>
+            {/* Description */}
+            {artwork.description && (
+              <div className="mb-4">
+                <p className="text-gray-600 leading-relaxed">
+                  {artwork.description}
+                </p>
               </div>
             )}
 
-            {/* Description */}
-            {artwork.description && (
+            {/* Price below description */}
+            {artwork.price && (
               <div className="mb-8">
-                <p className="text-gray-600 leading-relaxed">
-                  {artwork.description}
+                <p className="text-2xl font-bold">
+                  {artwork.price.toLocaleString("fr-FR")} €
                 </p>
               </div>
             )}
@@ -148,12 +149,18 @@ export default function ArtworkDetailPage() {
             <div className="space-y-4">
               {artwork.available !== false ? (
                 <>
-                  <button
-                    onClick={() => setShowContactForm(true)}
-                    className="w-full px-8 py-4 bg-black text-white text-sm tracking-[0.1em] hover:bg-gray-800 transition-colors duration-300"
-                  >
-                    Acquérir cette œuvre
-                  </button>
+                  {items.some((item) => item.artwork.id === artwork.id) ? (
+                    <div className="w-full px-8 py-4 bg-gray-100 text-gray-600 text-sm tracking-[0.1em] text-center">
+                      Déjà dans votre panier
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => addToCart(artwork)}
+                      className="w-full px-8 py-4 bg-black text-white text-sm tracking-[0.1em] hover:bg-gray-800 transition-colors duration-300"
+                    >
+                      Acquérir cette œuvre
+                    </button>
+                  )}
                   <Link
                     href="/contact"
                     className="block w-full px-8 py-4 border border-black text-sm tracking-[0.1em] text-center hover:bg-black hover:text-white transition-all duration-300"
@@ -232,102 +239,6 @@ export default function ArtworkDetailPage() {
         </section>
       )}
 
-      {/* Purchase Modal */}
-      {showContactForm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative">
-            <button
-              onClick={() => setShowContactForm(false)}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-black transition-colors"
-              aria-label="Fermer"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            <h2 className="text-2xl font-light tracking-[0.05em] mb-2">
-              Acquérir &ldquo;{artwork.title}&rdquo;
-            </h2>
-            <p className="text-gray-500 text-sm mb-6">
-              Remplissez ce formulaire pour réserver cette œuvre. Je vous
-              contacterai rapidement pour finaliser la transaction.
-            </p>
-
-            <form className="space-y-4">
-              <div>
-                <label className="block text-sm mb-2">Nom complet *</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 focus:border-black outline-none transition-colors"
-                  placeholder="Votre nom"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-2">Email *</label>
-                <input
-                  type="email"
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 focus:border-black outline-none transition-colors"
-                  placeholder="votre@email.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-2">Téléphone</label>
-                <input
-                  type="tel"
-                  className="w-full px-4 py-3 border border-gray-200 focus:border-black outline-none transition-colors"
-                  placeholder="Votre numéro"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-2">Message</label>
-                <textarea
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 focus:border-black outline-none transition-colors resize-none"
-                  placeholder="Questions ou précisions..."
-                />
-              </div>
-
-              <div className="bg-gray-50 p-4 text-sm">
-                <div className="flex justify-between mb-2">
-                  <span className="text-gray-500">Œuvre</span>
-                  <span className="font-medium">{artwork.title}</span>
-                </div>
-                {artwork.price && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Prix</span>
-                    <span className="font-medium">
-                      {artwork.price.toLocaleString("fr-FR")} €
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                className="w-full px-8 py-4 bg-black text-white text-sm tracking-[0.1em] hover:bg-gray-800 transition-colors duration-300"
-              >
-                Envoyer ma demande
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
