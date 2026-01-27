@@ -14,8 +14,9 @@ interface HomeSection {
 
 interface FeaturedArtwork {
   id: string;
+  collectionId: string;
   title: string;
-  images: string[];
+  images: string | string[];
   featured: boolean;
 }
 
@@ -60,8 +61,9 @@ export default function AdminHomePage() {
 
         const allArtworksData = artworks.map((a) => ({
           id: a.id,
+          collectionId: a.collectionId as string,
           title: a.title as string,
-          images: a.images as string[],
+          images: a.images as string | string[],
           featured: (a.featured as boolean) || false,
         }));
 
@@ -247,9 +249,9 @@ export default function AdminHomePage() {
                   className="relative group rounded-lg overflow-hidden border-2 border-black"
                 >
                   <div className="aspect-square bg-gray-100">
-                    {artwork.images?.[0] && (
+                    {artwork.images && (
                       <img
-                        src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/artworks/${artwork.id}/${artwork.images[0]}?thumb=200x200`}
+                        src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=200x200`}
                         alt={artwork.title}
                         className="w-full h-full object-cover"
                       />
@@ -283,9 +285,9 @@ export default function AdminHomePage() {
                 onClick={() => toggleFeatured(artwork.id, artwork.featured)}
               >
                 <div className="aspect-square bg-gray-100">
-                  {artwork.images?.[0] && (
+                  {artwork.images && (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/artworks/${artwork.id}/${artwork.images[0]}?thumb=200x200`}
+                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=200x200`}
                       alt={artwork.title}
                       className="w-full h-full object-cover"
                     />

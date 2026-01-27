@@ -1,8 +1,99 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { artworks } from "@/data/artworks";
+import { getPocketBase } from "@/lib/pocketbase";
+
+interface Artwork {
+  id: string;
+  collectionId: string;
+  title: string;
+  images: string | string[];
+  price?: number;
+}
+
+interface HeroContent {
+  title: string;
+  subtitle: string;
+  content: string;
+}
+
+// Composant pour les cartes mobile avec effet zoom au scroll
+function MobileArtworkCard({
+  artwork,
+  index,
+  isLoaded,
+  getImageUrl,
+}: {
+  artwork: { id: string; collectionId: string; title: string; images: string | string[] };
+  index: number;
+  isLoaded: boolean;
+  getImageUrl: (artwork: { id: string; collectionId: string; title: string; images: string | string[]; price?: number }) => string;
+}) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const handleScroll = () => {
+      const rect = card.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Calculer la position relative de la carte dans la fenêtre
+      const cardCenter = rect.top + rect.height / 2;
+      const screenCenter = windowHeight / 2;
+
+      // Distance du centre de l'écran (0 = au centre, 1 = en haut/bas de l'écran)
+      const distanceFromCenter = Math.abs(cardCenter - screenCenter) / (windowHeight / 2);
+
+      // Calculer le scale : max 1.11 au centre, min 1.0 aux bords
+      const newScale = 1 + (1 - Math.min(distanceFromCenter, 1)) * 0.11;
+
+      setScale(newScale);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Appel initial
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <Link
+      ref={cardRef}
+      href={`/boutique/${artwork.id}`}
+      className={`group relative block overflow-hidden rounded-lg transition-all duration-700 ease-out ${
+        isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      }`}
+      style={{
+        transitionDelay: `${index * 100}ms`,
+      }}
+    >
+      {/* Image Container avec effet zoom */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
+        <img
+          src={getImageUrl(artwork)}
+          alt={artwork.title}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 ease-out"
+          style={{
+            transform: `scale(${scale})`,
+          }}
+        />
+      </div>
+
+      {/* Titre avec encadré */}
+      <div className="pt-4 pb-2 px-4">
+        <div className="border border-gray-200 py-3 px-4">
+          <h2 className="text-lg font-light tracking-[0.1em] text-center">
+            {artwork.title}
+          </h2>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 // Valeurs fixes pour les particules (évite l'erreur d'hydratation)
 const VAPOR_PARTICLES = [
@@ -33,6 +124,48 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [introFading, setIntroFading] = useState(false);
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [heroContent, setHeroContent] = useState<HeroContent>({
+    title: "ZELLEM",
+    subtitle: "ART . LOVE . LIFE",
+    content: "Bienvenue dans mon univers artistique. Chaque œuvre raconte une histoire, capture une émotion, révèle une part de l'âme.",
+  });
+
+  // Charger les données depuis PocketBase
+  useEffect(() => {
+    const fetchData = async () => {
+      const pb = getPocketBase();
+
+      // Charger les œuvres (triées par position puis par titre)
+      try {
+        const artworksRecords = await pb.collection("artworks").getList<Artwork>(1, 50, {
+          sort: "position,title",
+        });
+        setArtworks(artworksRecords.items);
+      } catch (error) {
+        console.error("Erreur lors du chargement des œuvres:", error);
+      }
+
+      // Charger le contenu hero
+      try {
+        const heroRecords = await pb.collection("page_contents").getList(1, 1, {
+          filter: 'page = "home" && section = "hero"',
+        });
+        if (heroRecords.items.length > 0) {
+          const hero = heroRecords.items[0];
+          setHeroContent({
+            title: hero.title || "ZELLEM",
+            subtitle: hero.subtitle || "ART . LOVE . LIFE",
+            content: hero.content || "",
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement du hero:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     // Durée de l'intro avec le logo
@@ -52,6 +185,12 @@ export default function Home() {
       clearTimeout(fadeTimer);
     };
   }, []);
+
+  const getImageUrl = (artwork: Artwork) => {
+    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+    const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
+    return `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}`;
+  };
 
   return (
     <>
@@ -170,113 +309,80 @@ export default function Home() {
               className="text-6xl md:text-7xl lg:text-8xl tracking-[0.15em] mb-5"
               style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
             >
-              ZELLEM
+              {heroContent.title}
             </h1>
             <p className="text-xs md:text-sm tracking-[0.4em] text-gray-400 mb-10">
-              ART . LOVE . LIFE
+              {heroContent.subtitle}
             </p>
             <p className="text-gray-500 leading-relaxed max-w-xl text-center px-6 text-sm md:text-base">
-              Bienvenue dans mon univers artistique. Chaque œuvre raconte une
-              histoire, capture une émotion, révèle une part de l&apos;âme.
+              {heroContent.content}
             </p>
           </div>
         </section>
 
-        {/* Version Mobile - Encadrés stylisés */}
+        {/* Version Mobile - Effet zoom au scroll */}
         <div className="md:hidden px-4 pb-8 space-y-8">
           {artworks.map((artwork, index) => (
-            <Link
+            <MobileArtworkCard
               key={artwork.id}
-              href={`/boutique/${artwork.id}`}
-              className={`group block transition-all duration-700 ease-out ${
-                isLoaded
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8"
-              }`}
-              style={{
-                transitionDelay: `${index * 100}ms`,
-              }}
-            >
-              {/* Encadré stylisé */}
-              <div className="bg-white border border-gray-200 shadow-sm overflow-hidden">
-                {/* Image */}
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <img
-                    src={artwork.image}
-                    alt={artwork.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-active:scale-105"
-                  />
-                </div>
-
-                {/* Info de l'œuvre */}
-                <div className="p-5 bg-white border-t border-gray-100">
-                  <h2 className="text-lg font-light tracking-[0.1em] text-center mb-2">
-                    {artwork.title}
-                  </h2>
-                  {artwork.price && (
-                    <p className="text-sm text-gray-500 text-center">
-                      {artwork.price.toLocaleString("fr-FR")} €
-                    </p>
-                  )}
-                  <div className="mt-3 pt-3 border-t border-gray-100 text-center">
-                    <span className="text-xs tracking-[0.15em] text-gray-400 uppercase">
-                      Voir l&apos;œuvre
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Link>
+              artwork={artwork}
+              index={index}
+              isLoaded={isLoaded}
+              getImageUrl={getImageUrl}
+            />
           ))}
         </div>
 
-        {/* Version Desktop - Grille Style Novo */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3">
-          {artworks.map((artwork, index) => (
-            <Link
-              key={artwork.id}
-              href={`/boutique/${artwork.id}`}
-              className={`group relative block overflow-hidden transition-all duration-700 ease-out ${
-                isLoaded
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8"
-              }`}
-              style={{
-                transitionDelay: `${index * 100}ms`,
-              }}
-              onMouseEnter={() => setHoveredId(artwork.id)}
-              onMouseLeave={() => setHoveredId(null)}
-            >
-              {/* Image Container */}
-              <div className="relative aspect-[4/5] overflow-hidden">
-                {/* Image de l'œuvre */}
-                <img
-                  src={artwork.image}
-                  alt={artwork.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
+        {/* Version Desktop - Grille aérée avec animation hover */}
+        <div className="hidden md:block max-w-[90rem] mx-auto px-6 lg:px-12 pb-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {artworks.map((artwork, index) => (
+              <Link
+                key={artwork.id}
+                href={`/boutique/${artwork.id}`}
+                className={`group relative block overflow-hidden transition-all duration-700 ease-out ${
+                  isLoaded
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                }`}
+                style={{
+                  transitionDelay: `${index * 100}ms`,
+                }}
+                onMouseEnter={() => setHoveredId(artwork.id)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
+                {/* Image Container */}
+                <div className="relative aspect-[4/5] overflow-hidden">
+                  {/* Image de l'œuvre */}
+                  <img
+                    src={getImageUrl(artwork)}
+                    alt={artwork.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
 
-                {/* Hover overlay */}
-                <div
-                  className={`absolute inset-0 bg-black/30 transition-opacity duration-500 ${
-                    hoveredId === artwork.id ? "opacity-100" : "opacity-0"
-                  }`}
-                />
+                  {/* Hover overlay */}
+                  <div
+                    className={`absolute inset-0 bg-black/30 transition-opacity duration-500 ${
+                      hoveredId === artwork.id ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
 
-                {/* Titre centré sur l'image au hover */}
-                <div
-                  className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
-                    hoveredId === artwork.id
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-4"
-                  }`}
-                >
-                  <h2 className="text-white text-xl md:text-2xl lg:text-3xl font-light tracking-[0.15em] text-center px-6">
-                    {artwork.title}
-                  </h2>
+                  {/* Titre centré sur l'image au hover */}
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+                      hoveredId === artwork.id
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-4"
+                    }`}
+                  >
+                    <h2 className="text-white text-xl md:text-2xl lg:text-3xl font-light tracking-[0.15em] text-center px-6">
+                      {artwork.title}
+                    </h2>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </main>
     </>

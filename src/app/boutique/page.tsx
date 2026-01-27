@@ -2,15 +2,45 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { artworks as allArtworks } from "@/data/artworks";
+import { getPocketBase } from "@/lib/pocketbase";
+
+interface Artwork {
+  id: string;
+  collectionId: string;
+  title: string;
+  images: string | string[];
+  price?: number;
+  available?: boolean;
+}
 
 export default function BoutiquePage() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
+    const fetchArtworks = async () => {
+      const pb = getPocketBase();
+
+      try {
+        const records = await pb.collection("artworks").getList<Artwork>(1, 100, {
+          sort: "title",
+        });
+        setArtworks(records.items);
+      } catch (error) {
+        console.error("Erreur lors du chargement des œuvres:", error);
+      }
+
+      setTimeout(() => setIsLoaded(true), 100);
+    };
+
+    fetchArtworks();
   }, []);
+
+  const getImageUrl = (artwork: Artwork) => {
+    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+    const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
+    return `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}`;
+  };
 
   return (
     <main className="pt-[160px] min-h-screen bg-white">
@@ -24,14 +54,14 @@ export default function BoutiquePage() {
       {/* Barre de filtres / info */}
       <div className="px-[3vw] pb-6 flex items-center justify-between border-b border-gray-100">
         <div className="text-sm text-gray-500">
-          {allArtworks.length} œuvres
+          {artworks.length} œuvres
         </div>
       </div>
 
       {/* Grille de produits - Style e-commerce */}
       <div className="px-[3vw] py-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-          {allArtworks.map((artwork, index) => (
+          {artworks.map((artwork, index) => (
             <Link
               key={artwork.id}
               href={`/boutique/${artwork.id}`}
@@ -45,7 +75,7 @@ export default function BoutiquePage() {
               {/* Image Container */}
               <div className="relative aspect-[4/5] overflow-hidden bg-gray-50 mb-3">
                 <img
-                  src={artwork.image}
+                  src={getImageUrl(artwork)}
                   alt={artwork.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />

@@ -3,22 +3,132 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { artworks, getArtworkById, Artwork } from "@/data/artworks";
+import Head from "next/head";
+import { getPocketBase } from "@/lib/pocketbase";
 import { useCart } from "@/context/CartContext";
+
+interface Artwork {
+  id: string;
+  collectionId: string;
+  title: string;
+  slug?: string;
+  images: string | string[];
+  description?: string;
+  technique?: string;
+  dimensions?: string;
+  year?: number;
+  price?: number;
+  available?: boolean;
+  category?: string;
+  tags?: string[];
+}
 
 export default function ArtworkDetailPage() {
   const params = useParams();
   const [artwork, setArtwork] = useState<Artwork | null>(null);
+  const [similarArtworks, setSimilarArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { addToCart, items } = useCart();
 
   useEffect(() => {
-    const found = getArtworkById(params.id as string);
-    if (found) {
-      setArtwork(found);
+    const fetchArtwork = async () => {
+      const pb = getPocketBase();
+
+      try {
+        // Récupérer l'œuvre par son ID
+        const record = await pb.collection("artworks").getOne(params.id as string);
+        const artworkData = record as unknown as Artwork;
+        setArtwork(artworkData);
+
+        // Récupérer des œuvres similaires (autres œuvres)
+        try {
+          const similarRecords = await pb.collection("artworks").getList(1, 3, {
+            filter: `id != "${params.id}"`,
+            sort: "title",
+          });
+          setSimilarArtworks(similarRecords.items as unknown as Artwork[]);
+        } catch (error) {
+          console.error("Erreur lors du chargement des œuvres similaires:", error);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'œuvre:", error);
+        setArtwork(null);
+      }
+
+      setIsLoading(false);
+    };
+
+    if (params.id) {
+      fetchArtwork();
     }
-    setIsLoading(false);
   }, [params.id]);
+
+  // Mise à jour des métadonnées SEO
+  useEffect(() => {
+    if (artwork) {
+      // Mettre à jour le titre
+      document.title = `${artwork.title} | Zellem Art`;
+
+      // Mettre à jour ou créer les meta tags
+      const updateMeta = (name: string, content: string, isProperty = false) => {
+        const attr = isProperty ? 'property' : 'name';
+        let meta = document.querySelector(`meta[${attr}="${name}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute(attr, name);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      };
+
+      const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+      const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
+      const imageUrl = `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}`;
+
+      // Description
+      const description = artwork.description
+        ? artwork.description.substring(0, 160)
+        : `${artwork.title} - Œuvre originale par Zellem. ${artwork.technique || ''} ${artwork.dimensions || ''}`.trim();
+      updateMeta('description', description);
+
+      // Keywords (tags)
+      if (artwork.tags && artwork.tags.length > 0) {
+        updateMeta('keywords', artwork.tags.join(', '));
+      }
+
+      // Open Graph
+      updateMeta('og:title', `${artwork.title} | Zellem Art`, true);
+      updateMeta('og:description', description, true);
+      updateMeta('og:type', 'product', true);
+      updateMeta('og:image', imageUrl, true);
+
+      // Twitter Card
+      updateMeta('twitter:card', 'summary_large_image');
+      updateMeta('twitter:title', `${artwork.title} | Zellem Art`);
+      updateMeta('twitter:description', description);
+      updateMeta('twitter:image', imageUrl);
+    }
+  }, [artwork]);
+
+  const getImageUrl = (art: Artwork) => {
+    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+    const image = Array.isArray(art.images) ? art.images[0] : art.images;
+    return `${pbUrl}/api/files/${art.collectionId}/${art.id}/${image}`;
+  };
+
+  // Adapter l'artwork pour le panier (compatibilité avec CartContext)
+  const getCartArtwork = (art: Artwork) => ({
+    id: art.id,
+    title: art.title,
+    slug: art.slug || art.id,
+    image: getImageUrl(art),
+    description: art.description,
+    technique: art.technique,
+    dimensions: art.dimensions,
+    year: art.year,
+    price: art.price,
+    available: art.available,
+  });
 
   if (isLoading) {
     return (
@@ -49,11 +159,6 @@ export default function ArtworkDetailPage() {
     );
   }
 
-  // Trouver des œuvres similaires (autres œuvres)
-  const similarArtworks = artworks
-    .filter((a) => a.id !== artwork.id)
-    .slice(0, 3);
-
   return (
     <main className="pt-[160px] min-h-screen bg-white">
       {/* Breadcrumb */}
@@ -77,7 +182,7 @@ export default function ArtworkDetailPage() {
           {/* Image */}
           <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
             <img
-              src={artwork.image}
+              src={getImageUrl(artwork)}
               alt={artwork.title}
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -138,8 +243,8 @@ export default function ArtworkDetailPage() {
                 )}
                 <div>
                   <span className="text-gray-400 block mb-1">Disponibilité</span>
-                  <p className={`font-medium ${artwork.available ? "text-green-600" : "text-red-500"}`}>
-                    {artwork.available ? "Disponible" : "Vendu"}
+                  <p className={`font-medium ${artwork.available !== false ? "text-green-600" : "text-red-500"}`}>
+                    {artwork.available !== false ? "Disponible" : "Vendu"}
                   </p>
                 </div>
               </div>
@@ -155,7 +260,7 @@ export default function ArtworkDetailPage() {
                     </div>
                   ) : (
                     <button
-                      onClick={() => addToCart(artwork)}
+                      onClick={() => addToCart(getCartArtwork(artwork))}
                       className="w-full px-8 py-4 bg-black text-white text-sm tracking-[0.1em] hover:bg-gray-800 transition-colors duration-300"
                     >
                       Acquérir cette œuvre
@@ -198,6 +303,22 @@ export default function ArtworkDetailPage() {
                 <span>Livraison soignée et sécurisée</span>
               </div>
             </div>
+
+            {/* Tags pour SEO */}
+            {artwork.tags && artwork.tags.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="flex flex-wrap gap-2">
+                  {artwork.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -218,7 +339,7 @@ export default function ArtworkDetailPage() {
                 >
                   <div className="aspect-[4/5] relative overflow-hidden bg-gray-100 mb-4">
                     <img
-                      src={similar.image}
+                      src={getImageUrl(similar)}
                       alt={similar.title}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />

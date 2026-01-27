@@ -6,15 +6,15 @@ import Link from "next/link";
 
 interface Artwork {
   id: string;
+  collectionId: string;
   title: string;
   technique: string;
   dimensions: string;
   price: number;
   available: boolean;
   featured: boolean;
-  images: string[];
+  images: string | string[];
   category: string;
-  created: string;
 }
 
 export default function AdminProduitsPage() {
@@ -36,15 +36,15 @@ export default function AdminProduitsPage() {
       setArtworks(
         response.map((item) => ({
           id: item.id,
+          collectionId: item.collectionId as string,
           title: item.title as string,
           technique: item.technique as string,
           dimensions: item.dimensions as string,
           price: item.price as number,
           available: item.available as boolean,
           featured: item.featured as boolean,
-          images: item.images as string[],
+          images: item.images as string | string[],
           category: item.category as string,
-          created: item.created as string,
         }))
       );
     } catch (error) {
@@ -152,9 +152,9 @@ export default function AdminProduitsPage() {
               {/* Image */}
               <Link href={`/admin/produits/${artwork.id}`}>
                 <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                  {artwork.images?.[0] ? (
+                  {artwork.images ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/artworks/${artwork.id}/${artwork.images[0]}?thumb=400x400`}
+                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=400x400`}
                       alt={artwork.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

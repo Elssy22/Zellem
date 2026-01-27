@@ -33,6 +33,7 @@ export default function EditProduitPage() {
 
   const [images, setImages] = useState<ImageData[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [collectionId, setCollectionId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -77,9 +78,12 @@ export default function EditProduitPage() {
           featured: (product.featured as boolean) || false,
         });
 
-        const existingImages = (product.images as string[]) || [];
+        setCollectionId(product.collectionId as string);
+
+        const productImages = product.images;
+        const imageList = Array.isArray(productImages) ? productImages : (productImages ? [productImages] : []);
         setImages(
-          existingImages.map((filename) => ({
+          imageList.map((filename: string) => ({
             filename,
             isNew: false,
           }))
@@ -99,7 +103,7 @@ export default function EditProduitPage() {
     if (img.isNew && img.preview) {
       return img.preview;
     }
-    return `${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/artworks/${productId}/${img.filename}`;
+    return `${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${collectionId}/${productId}/${img.filename}`;
   };
 
   const handleImageAdd = (files: FileList | null) => {

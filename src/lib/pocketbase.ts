@@ -55,19 +55,13 @@ export async function getArtworks(
   const filter = filterParts.length > 0 ? filterParts.join(" && ") : "";
 
   // Construction du tri
-  let sort = "-created";
+  let sort = "title";
   switch (filters?.sortBy) {
     case "price_asc":
       sort = "price";
       break;
     case "price_desc":
       sort = "-price";
-      break;
-    case "date_asc":
-      sort = "created";
-      break;
-    case "date_desc":
-      sort = "-created";
       break;
     case "title":
       sort = "title";
@@ -123,7 +117,7 @@ export async function getFeaturedArtworks(limit: number = 6): Promise<Artwork[]>
   try {
     const response = await pb.collection("artworks").getList(1, limit, {
       filter: "featured = true && available = true",
-      sort: "-created",
+      sort: "title",
     });
 
     return response.items as unknown as Artwork[];
@@ -146,7 +140,7 @@ export async function getSimilarArtworks(
   try {
     const response = await pb.collection("artworks").getList(1, limit, {
       filter: `id != "${artworkId}" && category = "${category}"`,
-      sort: "-created",
+      sort: "title",
     });
 
     return response.items as unknown as Artwork[];

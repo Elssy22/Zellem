@@ -1,0 +1,13 @@
+# Robots.txt pour Zellem Art
+# https://zellem.art
+
+User-agent: *
+Allow: /
+
+# Pages admin non indexées
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://zellem.art/sitemap.xml

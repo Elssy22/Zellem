@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
 const navLinks = [
-  { href: "/", label: "Mon travail" },
-  { href: "/about", label: "Qui est Zellem" },
+  { href: "/", label: "Ma Galerie" },
+  { href: "/about", label: "Qui est Zellem ?" },
   { href: "/boutique", label: "Boutique" },
   { href: "/contact", label: "Contact" },
 ];

@@ -48,7 +48,7 @@ interface Stats {
   activeCarts: number;
   pendingOrders: number;
   unreadMessages: number;
-  topProducts: { id: string; title: string; views: number; image?: string }[];
+  topProducts: { id: string; collectionId: string; title: string; views: number; image?: string }[];
 }
 
 export default function AdminDashboard() {
@@ -95,9 +95,10 @@ export default function AdminDashboard() {
         const products = await pb.collection("artworks").getList(1, 5);
         topProducts = products.items.map((p) => ({
           id: p.id,
+          collectionId: p.collectionId as string,
           title: p.title as string,
           views: (p.views as number) || 0,
-          image: (p.images as string[])?.[0],
+          image: (p.images as string) || (p.images as string[])?.[0],
         }));
       } catch {
         // Collection n'existe pas ou pas de permissions
@@ -232,7 +233,7 @@ export default function AdminDashboard() {
                 <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                   {product.image ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/artworks/${product.id}/${product.image}?thumb=100x100`}
+                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${product.collectionId}/${product.id}/${product.image}?thumb=100x100`}
                       alt={product.title}
                       className="w-full h-full object-cover"
                     />
@@ -262,7 +263,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link
           href="/admin/produits/nouveau"
           className="bg-black text-white p-6 rounded-xl hover:bg-gray-800 transition-colors group"
@@ -276,6 +277,40 @@ export default function AdminDashboard() {
             <div>
               <p className="font-medium">Ajouter un produit</p>
               <p className="text-white/60 text-sm">Créer une nouvelle œuvre</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/organiser"
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-colors group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-medium">Organiser les œuvres</p>
+              <p className="text-white/60 text-sm">Glisser-déposer</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/media"
+          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-colors group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-medium">Bibliothèque médias</p>
+              <p className="text-white/60 text-sm">Images & vidéos</p>
             </div>
           </div>
         </Link>
