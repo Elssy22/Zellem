@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 import { slugify } from "@/lib/utils";
@@ -251,11 +252,13 @@ export default function EditProduitPage() {
                 key={index}
                 className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden group"
               >
-                <img
+                <Image
                   src={getImageUrl(img)}
                   alt={`Image ${index + 1}`}
-                  className="w-full h-full object-cover cursor-pointer"
+                  fill
+                  className="object-cover cursor-pointer"
                   onClick={() => setFullscreenImage(getImageUrl(img))}
+                  unoptimized
                 />
 
                 {/* Controls */}
@@ -492,19 +495,22 @@ export default function EditProduitPage() {
           onClick={() => setFullscreenImage(null)}
         >
           <button
-            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg transition-colors z-10"
             onClick={() => setFullscreenImage(null)}
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <img
-            src={fullscreenImage}
-            alt="Vue plein écran"
-            className="max-w-full max-h-full object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="relative w-full h-full" onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={fullscreenImage}
+              alt="Vue plein écran"
+              fill
+              className="object-contain"
+              unoptimized
+            />
+          </div>
         </div>
       )}
     </div>

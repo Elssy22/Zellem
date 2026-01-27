@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 
@@ -153,10 +154,12 @@ export default function AdminProduitsPage() {
               <Link href={`/admin/produits/${artwork.id}`}>
                 <div className="aspect-square bg-gray-100 relative overflow-hidden">
                   {artwork.images ? (
-                    <img
+                    <Image
                       src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=400x400`}
                       alt={artwork.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">

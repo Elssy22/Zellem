@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 
 interface Artwork {
@@ -74,10 +75,13 @@ export default function BoutiquePage() {
             >
               {/* Image Container */}
               <div className="relative aspect-[4/5] overflow-hidden bg-gray-50 mb-3">
-                <img
+                <Image
                   src={getImageUrl(artwork)}
                   alt={artwork.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  unoptimized
                 />
 
                 {/* Badge disponibilité */}

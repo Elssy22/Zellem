@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 
@@ -230,12 +231,14 @@ export default function AdminDashboard() {
                 className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <span className="text-gray-400 text-sm w-6">{index + 1}</span>
-                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
                   {product.image ? (
-                    <img
+                    <Image
                       src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${product.collectionId}/${product.id}/${product.image}?thumb=100x100`}
                       alt={product.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">

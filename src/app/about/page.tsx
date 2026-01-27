@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 
 interface PageContent {
@@ -123,11 +124,14 @@ export default function AboutPage() {
                       isEven ? "order-2 lg:order-1" : ""
                     }`}
                   >
-                    <div className="relative overflow-hidden flex items-center justify-center">
-                      <img
+                    <div className="relative overflow-hidden flex items-center justify-center aspect-[4/5]">
+                      <Image
                         src={imageUrl}
                         alt={section.title}
-                        className="w-full h-auto max-h-[500px] object-contain grayscale"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-contain grayscale"
+                        unoptimized
                       />
                     </div>
                   </div>

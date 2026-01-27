@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 
 interface AboutSection {
@@ -226,16 +227,18 @@ export default function AdminAboutPage() {
               <label className="block text-sm text-gray-600 mb-2">Image</label>
               <div
                 onClick={() => fileInputRefs.current[section.section]?.click()}
-                className="aspect-video bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer overflow-hidden"
+                className="aspect-video bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer overflow-hidden relative"
               >
                 {section.imagePreview || section.image ? (
-                  <img
+                  <Image
                     src={
                       section.imagePreview ||
                       `${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/page_contents/${section.id}/${section.image}`
                     }
                     alt={section.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">

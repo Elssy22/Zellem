@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
@@ -46,10 +47,13 @@ export default function Header() {
       <div className="flex items-center justify-between px-[3vw] py-0">
         {/* Logo - Gauche */}
         <Link href="/" className="relative z-50">
-          <img
+          <Image
             src="/images/LOGO.png"
             alt="Zellem"
+            width={128}
+            height={128}
             className="h-32 w-auto object-contain"
+            priority
           />
         </Link>
 

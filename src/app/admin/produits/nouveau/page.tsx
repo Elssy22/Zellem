@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 import { slugify } from "@/lib/utils";
@@ -169,10 +170,12 @@ export default function NouveauProduitPage() {
                 key={index}
                 className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden group"
               >
-                <img
+                <Image
                   src={img.preview}
                   alt={`Image ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  unoptimized
                 />
 
                 {/* Controls */}

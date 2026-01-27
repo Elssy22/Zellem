@@ -2,6 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CartPopup() {
   const { items, isCartOpen, closeCart, removeFromCart, totalPrice } = useCart();
@@ -66,11 +67,14 @@ export default function CartPopup() {
                     className="flex gap-4 pb-4 border-b border-gray-100"
                   >
                     {/* Image */}
-                    <div className="w-20 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
-                      <img
+                    <div className="w-20 h-24 flex-shrink-0 bg-gray-100 overflow-hidden relative">
+                      <Image
                         src={item.artwork.image}
                         alt={item.artwork.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                        unoptimized
                       />
                     </div>
 

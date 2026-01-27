@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 
@@ -327,10 +328,12 @@ export default function MediaPage() {
                     </div>
                   </div>
                 ) : (
-                  <img
+                  <Image
                     src={getFileUrl(media, "300x300")}
                     alt={media.alt_text || media.name}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 )}
 
@@ -402,10 +405,12 @@ export default function MediaPage() {
                     className="absolute inset-0 w-full h-full object-contain"
                   />
                 ) : (
-                  <img
+                  <Image
                     src={getFileUrl(selectedMedia)}
                     alt={selectedMedia.alt_text || selectedMedia.name}
-                    className="absolute inset-0 w-full h-full object-contain"
+                    fill
+                    className="object-contain"
+                    unoptimized
                   />
                 )}
               </div>

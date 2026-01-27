@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 
@@ -276,11 +277,13 @@ export default function OrganiserPage() {
 
             {/* Image */}
             <div className="aspect-[4/5] relative">
-              <img
+              <Image
                 src={getImageUrl(artwork)}
                 alt={artwork.title}
-                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                fill
+                className="object-cover pointer-events-none"
                 draggable={false}
+                unoptimized
               />
             </div>
 

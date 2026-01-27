@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Head from "next/head";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import { useCart } from "@/context/CartContext";
 
@@ -181,10 +181,14 @@ export default function ArtworkDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           {/* Image */}
           <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
-            <img
+            <Image
               src={getImageUrl(artwork)}
               alt={artwork.title}
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+              priority
+              unoptimized
             />
             {artwork.available === false && (
               <div className="absolute top-4 left-4">
@@ -338,10 +342,13 @@ export default function ArtworkDetailPage() {
                   className="group"
                 >
                   <div className="aspect-[4/5] relative overflow-hidden bg-gray-100 mb-4">
-                    <img
+                    <Image
                       src={getImageUrl(similar)}
                       alt={similar.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      unoptimized
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500" />
                   </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 
 interface HomeSection {
@@ -248,12 +249,14 @@ export default function AdminHomePage() {
                   key={artwork.id}
                   className="relative group rounded-lg overflow-hidden border-2 border-black"
                 >
-                  <div className="aspect-square bg-gray-100">
+                  <div className="aspect-square bg-gray-100 relative">
                     {artwork.images && (
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=200x200`}
                         alt={artwork.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        unoptimized
                       />
                     )}
                   </div>
@@ -284,12 +287,14 @@ export default function AdminHomePage() {
                 }`}
                 onClick={() => toggleFeatured(artwork.id, artwork.featured)}
               >
-                <div className="aspect-square bg-gray-100">
+                <div className="aspect-square bg-gray-100 relative">
                   {artwork.images && (
-                    <img
+                    <Image
                       src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=200x200`}
                       alt={artwork.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
                   )}
                 </div>

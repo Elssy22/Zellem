@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 
 interface Artwork {
@@ -73,13 +74,16 @@ function MobileArtworkCard({
     >
       {/* Image Container avec effet zoom */}
       <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
-        <img
+        <Image
           src={getImageUrl(artwork)}
           alt={artwork.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 ease-out"
+          fill
+          sizes="100vw"
+          className="object-cover transition-transform duration-300 ease-out"
           style={{
             transform: `scale(${scale})`,
           }}
+          unoptimized
         />
       </div>
 
@@ -222,10 +226,13 @@ export default function Home() {
               introFading ? "scale-110 opacity-0" : "scale-100 opacity-100"
             }`}
           >
-            <img
+            <Image
               src="/images/LOGO.png"
               alt="Zellem"
+              width={384}
+              height={384}
               className="w-64 md:w-80 lg:w-96 h-auto"
+              priority
             />
           </div>
 
@@ -354,10 +361,13 @@ export default function Home() {
                 {/* Image Container */}
                 <div className="relative aspect-[4/5] overflow-hidden">
                   {/* Image de l'œuvre */}
-                  <img
+                  <Image
                     src={getImageUrl(artwork)}
                     alt={artwork.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    unoptimized
                   />
 
                   {/* Hover overlay */}
