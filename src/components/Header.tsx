@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { href: "/", label: "Ma Galerie" },
-  { href: "/about", label: "Qui est Zellem ?" },
+  { href: "/about", label: "About Me" },
   { href: "/boutique", label: "Boutique" },
   { href: "/contact", label: "Contact" },
 ];

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 import Link from "next/link";
 
 interface Media {
@@ -28,6 +29,7 @@ export default function MediaPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "video">("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pbUrl = usePocketBaseUrl();
 
   // Form state for editing
   const [editName, setEditName] = useState("");
@@ -53,11 +55,10 @@ export default function MediaPage() {
     setIsLoading(false);
   };
 
-  const getFileUrl = (media: Media, thumb?: string) => {
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+  const getFileUrl = useCallback((media: Media, thumb?: string) => {
     const thumbParam = thumb ? `?thumb=${thumb}` : "";
     return `${pbUrl}/api/files/${media.collectionId}/${media.id}/${media.file}${thumbParam}`;
-  };
+  }, [pbUrl]);
 
   const isVideo = (media: Media) => {
     return media.type === "video" || media.file?.match(/\.(mp4|webm|mov)$/i);

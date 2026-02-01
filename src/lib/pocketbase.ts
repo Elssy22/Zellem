@@ -1,16 +1,42 @@
 import PocketBase from "pocketbase";
 import { Artwork, ContactMessage, SiteSettings, PaginatedResponse, ShopFilters } from "@/types";
 
-// Configuration PocketBase
-const POCKETBASE_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+// Configuration PocketBase - détection automatique local/distant
+const POCKETBASE_URL_LOCAL = process.env.NEXT_PUBLIC_POCKETBASE_URL_LOCAL || "http://127.0.0.1:8090";
+const POCKETBASE_URL_REMOTE = process.env.NEXT_PUBLIC_POCKETBASE_URL_REMOTE || "http://127.0.0.1:8090";
+
+// Fonction pour détecter si on est en local ou distant
+function getPocketBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    // Si on est en local (localhost ou 127.0.0.1), utiliser l'URL locale
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return POCKETBASE_URL_LOCAL;
+    }
+    // Sinon (tunnel Cloudflare ou autre), utiliser l'URL distante
+    return POCKETBASE_URL_REMOTE;
+  }
+  // Côté serveur, utiliser l'URL locale par défaut
+  return POCKETBASE_URL_LOCAL;
+}
+
+// Export de l'URL pour utilisation dans les composants
+export function getPocketBaseURL(): string {
+  return getPocketBaseUrl();
+}
 
 // Instance PocketBase singleton
 let pb: PocketBase | null = null;
+let currentUrl: string | null = null;
 
 export function getPocketBase(): PocketBase {
-  if (!pb) {
-    pb = new PocketBase(POCKETBASE_URL);
+  const url = getPocketBaseUrl();
+
+  // Si l'URL a changé, recréer l'instance
+  if (!pb || currentUrl !== url) {
+    pb = new PocketBase(url);
     pb.autoCancellation(false);
+    currentUrl = url;
   }
   return pb;
 }

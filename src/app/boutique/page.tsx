@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 
 interface Artwork {
   id: string;
@@ -17,6 +18,7 @@ interface Artwork {
 export default function BoutiquePage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const pbUrl = usePocketBaseUrl();
 
   useEffect(() => {
     const fetchArtworks = async () => {
@@ -37,11 +39,10 @@ export default function BoutiquePage() {
     fetchArtworks();
   }, []);
 
-  const getImageUrl = (artwork: Artwork) => {
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+  const getImageUrl = useCallback((artwork: Artwork) => {
     const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
     return `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}`;
-  };
+  }, [pbUrl]);
 
   return (
     <main className="pt-[160px] min-h-screen bg-white">

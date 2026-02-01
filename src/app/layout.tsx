@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
 import JsonLd, { organizationJsonLd, artistJsonLd } from "@/components/JsonLd";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -81,12 +81,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body className="min-h-screen flex flex-col">
+        <GoogleAnalytics />
         <Providers>
-          <Header />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </Providers>
       </body>
     </html>

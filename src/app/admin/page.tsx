@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 import Link from "next/link";
 
 // Icônes
@@ -43,6 +44,21 @@ const TrendingIcon = () => (
   </svg>
 );
 
+const AlertIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+);
+
+interface LowStockProduct {
+  id: string;
+  collectionId: string;
+  title: string;
+  stock: number;
+  stock_alert_threshold: number;
+  image?: string;
+}
+
 interface Stats {
   dailyVisits: number;
   liveVisitors: number;
@@ -50,6 +66,7 @@ interface Stats {
   pendingOrders: number;
   unreadMessages: number;
   topProducts: { id: string; collectionId: string; title: string; views: number; image?: string }[];
+  lowStockProducts: LowStockProduct[];
 }
 
 export default function AdminDashboard() {
@@ -60,8 +77,18 @@ export default function AdminDashboard() {
     pendingOrders: 0,
     unreadMessages: 0,
     topProducts: [],
+    lowStockProducts: [],
   });
   const [isLoading, setIsLoading] = useState(true);
+  const pbUrl = usePocketBaseUrl();
+
+  const getImageUrl = useCallback((product: Stats["topProducts"][0]) => {
+    return `${pbUrl}/api/files/${product.collectionId}/${product.id}/${product.image}?thumb=100x100`;
+  }, [pbUrl]);
+
+  const getLowStockImageUrl = useCallback((product: LowStockProduct) => {
+    return `${pbUrl}/api/files/${product.collectionId}/${product.id}/${product.image}?thumb=100x100`;
+  }, [pbUrl]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -105,6 +132,29 @@ export default function AdminDashboard() {
         // Collection n'existe pas ou pas de permissions
       }
 
+      // Produits avec stock bas
+      let lowStockProducts: LowStockProduct[] = [];
+      try {
+        const allProducts = await pb.collection("artworks").getFullList();
+        lowStockProducts = allProducts
+          .filter((p) => {
+            const stock = (p.stock as number) ?? 1;
+            const threshold = (p.stock_alert_threshold as number) ?? 1;
+            return stock <= threshold;
+          })
+          .map((p) => ({
+            id: p.id,
+            collectionId: p.collectionId as string,
+            title: p.title as string,
+            stock: (p.stock as number) ?? 1,
+            stock_alert_threshold: (p.stock_alert_threshold as number) ?? 1,
+            image: Array.isArray(p.images) ? p.images[0] : (p.images as string),
+          }))
+          .sort((a, b) => a.stock - b.stock); // Stock le plus bas en premier
+      } catch {
+        // Collection n'existe pas ou pas de permissions
+      }
+
       setStats({
         dailyVisits: Math.floor(Math.random() * 100) + 50, // Demo - à remplacer par vraies stats
         liveVisitors: Math.floor(Math.random() * 10) + 1, // Demo
@@ -112,6 +162,7 @@ export default function AdminDashboard() {
         pendingOrders,
         unreadMessages: unreadMessagesCount,
         topProducts,
+        lowStockProducts,
       });
 
       setIsLoading(false);
@@ -202,6 +253,79 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      {/* Stock alerts */}
+      {stats.lowStockProducts.length > 0 && (
+        <div className="bg-white rounded-xl border border-red-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-100 rounded-lg text-red-600">
+                <AlertIcon />
+              </div>
+              <div>
+                <h2 className="font-medium flex items-center gap-2">
+                  Alertes Stock
+                  <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    {stats.lowStockProducts.length}
+                  </span>
+                </h2>
+                <p className="text-gray-500 text-sm">Produits nécessitant votre attention</p>
+              </div>
+            </div>
+            <Link
+              href="/admin/produits"
+              className="text-sm text-gray-500 hover:text-black transition-colors"
+            >
+              Gérer les stocks →
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {stats.lowStockProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={`/admin/produits/${product.id}`}
+                className="flex items-center gap-4 p-3 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
+                  {product.image ? (
+                    <Image
+                      src={getLowStockImageUrl(product)}
+                      alt={product.title}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{product.title}</p>
+                  <p className="text-xs text-gray-500">
+                    Seuil d&apos;alerte: {product.stock_alert_threshold}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${
+                      product.stock === 0
+                        ? "bg-red-100 text-red-700"
+                        : "bg-orange-100 text-orange-700"
+                    }`}
+                  >
+                    {product.stock === 0 ? "Rupture" : `${product.stock} en stock`}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Top products */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">
@@ -234,7 +358,7 @@ export default function AdminDashboard() {
                 <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 relative">
                   {product.image ? (
                     <Image
-                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${product.collectionId}/${product.id}/${product.image}?thumb=100x100`}
+                      src={getImageUrl(product)}
                       alt={product.title}
                       fill
                       className="object-cover"

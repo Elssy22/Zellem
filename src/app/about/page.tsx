@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 
 interface PageContent {
   id: string;
@@ -20,6 +21,7 @@ interface PageContent {
 export default function AboutPage() {
   const [sections, setSections] = useState<PageContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const pbUrl = usePocketBaseUrl();
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -62,11 +64,10 @@ export default function AboutPage() {
     }
   }, [isLoading, sections]);
 
-  const getImageUrl = (section: PageContent) => {
+  const getImageUrl = useCallback((section: PageContent) => {
     if (!section.image) return null;
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
     return `${pbUrl}/api/files/${section.collectionId}/${section.id}/${section.image}`;
-  };
+  }, [pbUrl]);
 
   const heroSection = sections.find((s) => s.section === "hero");
   const contentSections = sections.filter((s) => s.section !== "hero");
@@ -83,7 +84,7 @@ export default function AboutPage() {
     <main className="pt-[128px] min-h-screen bg-white">
       {/* Hero Section */}
       {heroSection && (
-        <section className="w-full py-10 md:py-16 reveal-on-scroll opacity-0">
+        <section className="w-full py-10 md:py-16 px-6 md:px-[3vw] reveal-on-scroll opacity-0">
           <div className="w-full flex flex-col items-center">
             <h1
               className="text-3xl md:text-4xl lg:text-5xl tracking-[0.15em] mb-8 text-center"
@@ -92,12 +93,12 @@ export default function AboutPage() {
               {heroSection.title}
             </h1>
             {heroSection.subtitle && (
-              <p className="text-sm md:text-base tracking-[0.2em] text-gray-500 mb-10 italic">
+              <p className="text-sm md:text-base tracking-[0.2em] text-gray-500 mb-10 italic text-center">
                 {heroSection.subtitle}
               </p>
             )}
             {heroSection.content && (
-              <p className="text-gray-500 leading-relaxed max-w-2xl text-center px-6 text-sm md:text-base">
+              <p className="text-gray-500 leading-relaxed max-w-2xl text-center text-sm md:text-base">
                 {heroSection.content}
               </p>
             )}
@@ -113,7 +114,7 @@ export default function AboutPage() {
         return (
           <section
             key={section.id}
-            className={`px-[3vw] py-16 ${isEven ? "bg-gray-50" : ""}`}
+            className={`px-6 md:px-[5vw] py-16 ${isEven ? "bg-gray-50" : ""}`}
           >
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -121,7 +122,7 @@ export default function AboutPage() {
                 {imageUrl && (
                   <div
                     className={`reveal-on-scroll opacity-0 ${
-                      isEven ? "order-2 lg:order-1" : ""
+                      !isEven ? "lg:order-2" : "lg:order-1"
                     }`}
                   >
                     <div className="relative overflow-hidden flex items-center justify-center aspect-[4/5]">
@@ -140,7 +141,7 @@ export default function AboutPage() {
                 {/* Texte */}
                 <div
                   className={`reveal-on-scroll opacity-0 ${
-                    isEven && imageUrl ? "order-1 lg:order-2" : ""
+                    !isEven && imageUrl ? "lg:order-1" : "lg:order-2"
                   }`}
                 >
                   <h3 className="text-xl font-light tracking-[0.1em] mb-6">
@@ -158,7 +159,7 @@ export default function AboutPage() {
       })}
 
       {/* Signature + CTA */}
-      <section className="px-[3vw] py-16">
+      <section className="px-6 md:px-[5vw] py-16">
         <div className="max-w-3xl mx-auto text-center reveal-on-scroll opacity-0">
           <p className="text-xs md:text-sm tracking-[0.4em] text-gray-400 mb-4">
             ART . LOVE . LIFE

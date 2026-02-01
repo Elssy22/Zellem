@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 import Link from "next/link";
 
 interface Artwork {
@@ -20,6 +21,7 @@ export default function OrganiserPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const pbUrl = usePocketBaseUrl();
 
   useEffect(() => {
     fetchArtworks();
@@ -39,11 +41,10 @@ export default function OrganiserPage() {
     setIsLoading(false);
   };
 
-  const getImageUrl = (artwork: Artwork) => {
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+  const getImageUrl = useCallback((artwork: Artwork) => {
     const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
     return `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}`;
-  };
+  }, [pbUrl]);
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
     setDraggedId(id);

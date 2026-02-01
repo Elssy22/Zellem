@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 import Link from "next/link";
 
 interface Artwork {
@@ -16,13 +17,22 @@ interface Artwork {
   featured: boolean;
   images: string | string[];
   category: string;
+  stock: number;
+  stock_alert_threshold: number;
+  out_of_stock_message: string;
 }
 
 export default function AdminProduitsPage() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "available" | "sold">("all");
+  const [filter, setFilter] = useState<"all" | "available" | "sold" | "low_stock">("all");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const pbUrl = usePocketBaseUrl();
+
+  const getImageUrl = useCallback((artwork: Artwork) => {
+    const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
+    return `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}?thumb=400x400`;
+  }, [pbUrl]);
 
   useEffect(() => {
     fetchArtworks();
@@ -46,6 +56,9 @@ export default function AdminProduitsPage() {
           featured: item.featured as boolean,
           images: item.images as string | string[],
           category: item.category as string,
+          stock: (item.stock as number) ?? 1,
+          stock_alert_threshold: (item.stock_alert_threshold as number) ?? 1,
+          out_of_stock_message: (item.out_of_stock_message as string) || "",
         }))
       );
     } catch (error) {
@@ -88,8 +101,11 @@ export default function AdminProduitsPage() {
   const filteredArtworks = artworks.filter((a) => {
     if (filter === "available") return a.available;
     if (filter === "sold") return !a.available;
+    if (filter === "low_stock") return a.stock <= a.stock_alert_threshold;
     return true;
   });
+
+  const lowStockCount = artworks.filter((a) => a.stock <= a.stock_alert_threshold).length;
 
   if (isLoading) {
     return (
@@ -122,7 +138,7 @@ export default function AdminProduitsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {[
           { key: "all", label: "Tout" },
           { key: "available", label: "Disponibles" },
@@ -140,6 +156,23 @@ export default function AdminProduitsPage() {
             {f.label}
           </button>
         ))}
+        <button
+          onClick={() => setFilter("low_stock")}
+          className={`px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+            filter === "low_stock"
+              ? "bg-red-500 text-white"
+              : "bg-red-50 text-red-600 hover:bg-red-100"
+          }`}
+        >
+          Stock bas
+          {lowStockCount > 0 && (
+            <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+              filter === "low_stock" ? "bg-white/20" : "bg-red-500 text-white"
+            }`}>
+              {lowStockCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Products grid */}
@@ -155,7 +188,7 @@ export default function AdminProduitsPage() {
                 <div className="aspect-square bg-gray-100 relative overflow-hidden">
                   {artwork.images ? (
                     <Image
-                      src={`${process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090"}/api/files/${artwork.collectionId}/${artwork.id}/${Array.isArray(artwork.images) ? artwork.images[0] : artwork.images}?thumb=400x400`}
+                      src={getImageUrl(artwork)}
                       alt={artwork.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -170,7 +203,7 @@ export default function AdminProduitsPage() {
                   )}
 
                   {/* Status badges */}
-                  <div className="absolute top-2 left-2 flex gap-2">
+                  <div className="absolute top-2 left-2 flex flex-wrap gap-2">
                     {artwork.featured && (
                       <span className="bg-black text-white text-xs px-2 py-1 rounded">
                         ★ Vedette
@@ -179,6 +212,22 @@ export default function AdminProduitsPage() {
                     {!artwork.available && (
                       <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
                         Vendue
+                      </span>
+                    )}
+                  </div>
+                  {/* Stock badge */}
+                  <div className="absolute top-2 right-2">
+                    {artwork.stock === 0 ? (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                        Rupture
+                      </span>
+                    ) : artwork.stock <= artwork.stock_alert_threshold ? (
+                      <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                        Stock: {artwork.stock}
+                      </span>
+                    ) : (
+                      <span className="bg-green-500/80 text-white text-xs px-2 py-1 rounded">
+                        Stock: {artwork.stock}
                       </span>
                     )}
                   </div>

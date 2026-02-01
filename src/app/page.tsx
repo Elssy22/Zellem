@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 
 interface Artwork {
   id: string;
@@ -134,6 +135,7 @@ export default function Home() {
     subtitle: "ART . LOVE . LIFE",
     content: "Bienvenue dans mon univers artistique. Chaque œuvre raconte une histoire, capture une émotion, révèle une part de l'âme.",
   });
+  const pbUrl = usePocketBaseUrl();
 
   // Charger les données depuis PocketBase
   useEffect(() => {
@@ -190,11 +192,10 @@ export default function Home() {
     };
   }, []);
 
-  const getImageUrl = (artwork: Artwork) => {
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+  const getImageUrl = useCallback((artwork: Artwork) => {
     const image = Array.isArray(artwork.images) ? artwork.images[0] : artwork.images;
     return `${pbUrl}/api/files/${artwork.collectionId}/${artwork.id}/${image}`;
-  };
+  }, [pbUrl]);
 
   return (
     <>

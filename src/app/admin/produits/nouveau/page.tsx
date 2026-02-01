@@ -26,6 +26,9 @@ export default function NouveauProduitPage() {
     year: new Date().getFullYear().toString(),
     available: true,
     featured: false,
+    stock: "1",
+    stock_alert_threshold: "1",
+    out_of_stock_message: "",
   });
 
   const [images, setImages] = useState<ImageFile[]>([]);
@@ -116,6 +119,11 @@ export default function NouveauProduitPage() {
       data.append("available", String(formData.available));
       data.append("featured", String(formData.featured));
       data.append("views", "0");
+      data.append("stock", formData.stock || "1");
+      data.append("stock_alert_threshold", formData.stock_alert_threshold || "1");
+      if (formData.out_of_stock_message) {
+        data.append("out_of_stock_message", formData.out_of_stock_message);
+      }
 
       images.forEach((img) => {
         data.append("images", img.file);
@@ -339,6 +347,69 @@ export default function NouveauProduitPage() {
               />
             </div>
           </div>
+        </div>
+
+        {/* Stock */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6">
+          <h2 className="font-medium mb-4">Gestion du stock</h2>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">
+                Quantité en stock
+              </label>
+              <input
+                type="number"
+                value={formData.stock}
+                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="1"
+                min="0"
+              />
+              <p className="text-gray-400 text-xs mt-1">Pour une œuvre unique, laissez 1</p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">
+                Seuil d&apos;alerte
+              </label>
+              <input
+                type="number"
+                value={formData.stock_alert_threshold}
+                onChange={(e) => setFormData({ ...formData, stock_alert_threshold: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+                placeholder="1"
+                min="0"
+              />
+              <p className="text-gray-400 text-xs mt-1">Alerte si stock en dessous de ce seuil</p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">
+                Message si rupture
+              </label>
+              <select
+                value={formData.out_of_stock_message}
+                onChange={(e) => setFormData({ ...formData, out_of_stock_message: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors bg-white"
+              >
+                <option value="">Aucun (masquer si stock = 0)</option>
+                <option value="rupture">Rupture de stock</option>
+                <option value="bientot_retour">Bientôt de retour</option>
+              </select>
+              <p className="text-gray-400 text-xs mt-1">Affiché quand le stock est à 0</p>
+            </div>
+          </div>
+
+          {/* Stock warning indicator */}
+          {parseInt(formData.stock) > 0 && parseInt(formData.stock) <= parseInt(formData.stock_alert_threshold) && (
+            <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-center gap-2">
+              <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span className="text-yellow-800 text-sm">Stock bas : {formData.stock} unité(s) restante(s)</span>
+            </div>
+          )}
         </div>
 
         {/* Options */}

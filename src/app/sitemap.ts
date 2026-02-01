@@ -60,12 +60,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (response.ok) {
       const data = await response.json();
-      artworkPages = data.items.map((artwork: { id: string; updated: string }) => ({
-        url: `${baseUrl}/boutique/${artwork.id}`,
-        lastModified: new Date(artwork.updated),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }));
+      artworkPages = data.items
+        .filter((artwork: { id: string; updated: string }) => {
+          const date = new Date(artwork.updated);
+          return !isNaN(date.getTime());
+        })
+        .map((artwork: { id: string; updated: string }) => ({
+          url: `${baseUrl}/boutique/${artwork.id}`,
+          lastModified: new Date(artwork.updated),
+          changeFrequency: "weekly" as const,
+          priority: 0.8,
+        }));
     }
   } catch (error) {
     console.error("Erreur lors de la génération du sitemap:", error);

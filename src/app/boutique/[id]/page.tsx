@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import { useCart } from "@/context/CartContext";
+import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 
 interface Artwork {
   id: string;
@@ -29,6 +30,7 @@ export default function ArtworkDetailPage() {
   const [similarArtworks, setSimilarArtworks] = useState<Artwork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { addToCart, items } = useCart();
+  const pbUrl = usePocketBaseUrl();
 
   useEffect(() => {
     const fetchArtwork = async () => {
@@ -110,11 +112,10 @@ export default function ArtworkDetailPage() {
     }
   }, [artwork]);
 
-  const getImageUrl = (art: Artwork) => {
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
+  const getImageUrl = useCallback((art: Artwork) => {
     const image = Array.isArray(art.images) ? art.images[0] : art.images;
     return `${pbUrl}/api/files/${art.collectionId}/${art.id}/${image}`;
-  };
+  }, [pbUrl]);
 
   // Adapter l'artwork pour le panier (compatibilité avec CartContext)
   const getCartArtwork = (art: Artwork) => ({
