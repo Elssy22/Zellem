@@ -30,10 +30,10 @@ export default function OrganiserPage() {
   const fetchArtworks = async () => {
     const pb = getPocketBase();
     try {
-      const records = await pb.collection("artworks").getList<Artwork>(1, 50, {
+      const records = await pb.collection("artworks").getFullList<Artwork>({
         sort: "position,title",
       });
-      setArtworks(records.items);
+      setArtworks(records);
     } catch (error) {
       console.error("Erreur:", error);
       setMessage("Erreur lors du chargement des œuvres");

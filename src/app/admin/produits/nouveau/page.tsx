@@ -6,6 +6,7 @@ import Image from "next/image";
 import { getPocketBase } from "@/lib/pocketbase";
 import Link from "next/link";
 import { slugify } from "@/lib/utils";
+import { TECHNIQUES, CATEGORIES } from "@/lib/constants";
 
 interface ImageFile {
   file: File;
@@ -35,25 +36,6 @@ export default function NouveauProduitPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const techniques = [
-    "Acrylique sur toile",
-    "Huile sur toile",
-    "Technique mixte",
-    "Aquarelle",
-    "Pastel",
-    "Encre",
-    "Autre",
-  ];
-
-  const categories = [
-    "Figuratif",
-    "Abstrait",
-    "Portrait",
-    "Paysage",
-    "Nature morte",
-    "Contemporain",
-    "Autre",
-  ];
 
   const handleImageAdd = (files: FileList | null) => {
     if (!files) return;
@@ -289,7 +271,7 @@ export default function NouveauProduitPage() {
                 onChange={(e) => setFormData({ ...formData, technique: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors bg-white"
               >
-                {techniques.map((t) => (
+                {TECHNIQUES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
@@ -302,7 +284,7 @@ export default function NouveauProduitPage() {
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors bg-white"
               >
-                {categories.map((c) => (
+                {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>

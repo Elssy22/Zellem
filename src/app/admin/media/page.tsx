@@ -44,10 +44,10 @@ export default function MediaPage() {
   const fetchMedia = async () => {
     const pb = getPocketBase();
     try {
-      const records = await pb.collection("media").getList<Media>(1, 100, {
+      const records = await pb.collection("media").getFullList<Media>({
         sort: "name",
       });
-      setMediaList(records.items);
+      setMediaList(records);
     } catch (error) {
       console.error("Erreur:", error);
       setMessage({ type: "error", text: "Erreur lors du chargement des médias" });

@@ -7,6 +7,7 @@ import { getPocketBase } from "@/lib/pocketbase";
 import { usePocketBaseUrl } from "@/hooks/usePocketBaseUrl";
 import Link from "next/link";
 import { slugify } from "@/lib/utils";
+import { TECHNIQUES, CATEGORIES } from "@/lib/constants";
 
 interface ImageData {
   filename: string;
@@ -45,26 +46,6 @@ export default function EditProduitPage() {
   const [error, setError] = useState("");
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
-  const techniques = [
-    "Acrylique sur toile",
-    "Huile sur toile",
-    "Technique mixte",
-    "Aquarelle",
-    "Pastel",
-    "Encre",
-    "Autre",
-  ];
-
-  const categories = [
-    "Figuratif",
-    "Abstrait",
-    "Portrait",
-    "Paysage",
-    "Nature morte",
-    "Contemporain",
-    "Autre",
-  ];
-
   useEffect(() => {
     const fetchProduct = async () => {
       const pb = getPocketBase();
@@ -90,7 +71,17 @@ export default function EditProduitPage() {
         setCollectionId(product.collectionId as string);
 
         const productImages = product.images;
-        const imageList = Array.isArray(productImages) ? productImages : (productImages ? [productImages] : []);
+        let imageList: string[];
+        if (Array.isArray(productImages)) {
+          imageList = productImages;
+        } else if (typeof productImages === "string" && productImages) {
+          // Handle case where images might be a comma-separated string
+          imageList = productImages.includes(",")
+            ? productImages.split(",").map((s: string) => s.trim())
+            : [productImages];
+        } else {
+          imageList = [];
+        }
         setImages(
           imageList.map((filename: string) => ({
             filename,
@@ -393,7 +384,7 @@ export default function EditProduitPage() {
                 onChange={(e) => setFormData({ ...formData, technique: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors bg-white"
               >
-                {techniques.map((t) => (
+                {TECHNIQUES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
               </select>
@@ -406,7 +397,7 @@ export default function EditProduitPage() {
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors bg-white"
               >
-                {categories.map((c) => (
+                {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>

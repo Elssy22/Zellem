@@ -154,6 +154,8 @@ export default function AdminStatsPage() {
     };
 
     loadData();
+    // Note: period is included for future GA integration
+    // fetchArtworkViews doesn't use period but is called in loadData
   }, [period, fetchArtworkViews]);
 
   const periods: { key: Period; label: string }[] = [

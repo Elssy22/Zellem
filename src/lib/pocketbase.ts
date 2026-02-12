@@ -20,10 +20,8 @@ function getPocketBaseUrl(): string {
   return POCKETBASE_URL_LOCAL;
 }
 
-// Export de l'URL pour utilisation dans les composants
-export function getPocketBaseURL(): string {
-  return getPocketBaseUrl();
-}
+// Exporte les constantes pour le hook
+export { POCKETBASE_URL_LOCAL, POCKETBASE_URL_REMOTE };
 
 // Instance PocketBase singleton
 let pb: PocketBase | null = null;
@@ -178,6 +176,27 @@ export async function getSimilarArtworks(
 
 /**
  * Récupère l'URL d'une image depuis PocketBase
+ * @param collectionId - ID de la collection
+ * @param recordId - ID de l'enregistrement
+ * @param filename - Nom du fichier
+ * @param thumb - Taille du thumbnail (ex: "100x100", "200x200")
+ */
+export function buildImageUrl(
+  collectionId: string,
+  recordId: string,
+  filename: string,
+  thumb?: string
+): string {
+  const baseUrl = getPocketBaseUrl();
+  let url = `${baseUrl}/api/files/${collectionId}/${recordId}/${filename}`;
+  if (thumb) {
+    url += `?thumb=${thumb}`;
+  }
+  return url;
+}
+
+/**
+ * Récupère l'URL d'une image depuis PocketBase (version legacy)
  */
 export function getImageUrl(record: Artwork, filename: string): string {
   const pb = getPocketBase();
